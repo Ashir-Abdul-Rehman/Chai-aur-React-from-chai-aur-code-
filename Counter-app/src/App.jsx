@@ -28,7 +28,7 @@ function App() {
       <button onClick={removevalue}>Decrement</button>
       <br />
       <br />
-      <button onClick={resetvalue}>Decrement</button>
+      <button onClick={resetvalue}>Reset</button>
     </>
   )
 }
