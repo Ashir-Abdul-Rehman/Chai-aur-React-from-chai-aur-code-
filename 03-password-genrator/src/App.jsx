@@ -1,23 +1,98 @@
-import './App.css'
+import { useState, useCallback, useEffect, useRef } from 'react'
+import "./App.css"
+
 
 function App() {
+  const [length, setLength] = useState(8)
+  const [numberAllowed, setNumberAllowed] = useState(false);
+  const [charAllowed, setCharAllowed] = useState(false)
+  const [password, setPassword] = useState("")
 
+  //useRef hook
+  const passwordRef = useRef(null)
+
+  const passwordGenerator = useCallback(() => {
+    let pass = ""
+    let str = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+    if (numberAllowed) str += "0123456789"
+    if (charAllowed) str += "!@#$%^&*-_+=[]{}~`"
+
+    for (let i = 1; i <= length; i++) {
+      let char = Math.floor(Math.random() * str.length + 1)
+      pass += str.charAt(char)
+      
+    }
+
+    setPassword(pass)
+
+
+  }, [length, numberAllowed, charAllowed, setPassword])
+
+  const copyPasswordToClipboard = useCallback(() => {
+    passwordRef.current?.select();
+    passwordRef.current?.setSelectionRange(0, 999);
+    window.navigator.clipboard.writeText(password)
+  }, [password])
+
+  useEffect(() => {
+    passwordGenerator()
+  }, [length, numberAllowed, charAllowed, passwordGenerator])
   return (
-    <>
-    <h1 className='text-3xl font-bold underline text-center ' >Password Genrator</h1>
-    <div className='flex justify-center mt-6'>
-    <div className="div mt-6 flex items-center justify-center bg-[#3d3d3d] w-[600px] rounded-sm flex-wrap">
-      <h3 className='h-12 border-none w-[486.389px] bg-[#000000a6] pt-3 rounded-l-md '>Password</h3>
-      <button className='bg-black text-white h-12 w-auto border-none rounded-r-md '><svg className='w-12 h-12 p-1' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4V2H17V4H20.0066C20.5552 4 21 4.44495 21 4.9934V21.0066C21 21.5552 20.5551 22 20.0066 22H3.9934C3.44476 22 3 21.5551 3 21.0066V4.9934C3 4.44476 3.44495 4 3.9934 4H7ZM7 6H5V20H19V6H17V8H7V6ZM9 4V6H15V4H9Z"></path></svg></button>
-      <div className='mt-8 flex justify-center flex-wrap'>
-      <input type="range" name="" id="" className='mr-2' />
-      <p>{"length ( )"}</p>
-      <input type="checkbox" name="" id="num" className='ml-2' /> <label htmlFor="num" className='ml-2'>Name</label>
-      <input type="checkbox" name="" id="char" className='ml-2' /> <label htmlFor="char" className='ml-2'>Chracters</label>
+    
+    <div className="w-full max-w-md mx-auto shadow-md rounded-lg px-4 py-3 my-8 bg-gray-800 text-orange-500">
+      <h1 className='text-white text-center my-3'>Password generator</h1>
+    <div className="flex shadow rounded-lg overflow-hidden mb-4">
+        <input
+            type="text"
+            value={password}
+            className="input outline-none w-full py-1 px-3"
+            placeholder="Password"
+            readOnly
+            ref={passwordRef}
+        />
+        <button
+        onClick={copyPasswordToClipboard}
+        className='outline-none bg-blue-700 text-white px-3 py-0.5 shrink-0'
+        >copy</button>
+        
+    </div>
+    <div className='flex text-sm gap-x-2'>
+      <div className='flex items-center gap-x-1'>
+        <input 
+        type="range"
+        min={6}
+        max={20}
+        value={length}
+         className='cursor-pointer'
+         onChange={(e) => {setLength(e.target.value)}}
+          />
+          <label>Length: {length}</label>
+      </div>
+      <div className="flex items-center gap-x-1">
+      <input
+          type="checkbox"
+          defaultChecked={numberAllowed}
+          id="numberInput"
+          onChange={() => {
+              setNumberAllowed((prev) => !prev);
+          }}
+      />
+      <label htmlFor="numberInput">Numbers</label>
+      </div>
+      <div className="flex items-center gap-x-1">
+          <input
+              type="checkbox"
+              defaultChecked={charAllowed}
+              id="characterInput"
+              onChange={() => {
+                  setCharAllowed((prev) => !prev )
+              }}
+          />
+          <label htmlFor="characterInput">Characters</label>
       </div>
     </div>
-    </div>
-    </>
+</div>
+    
   )
 }
 
